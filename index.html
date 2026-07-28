@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ONCE – אסף נחשוני</title>
+  <style>
+    @font-face { font-family:'Ratzif22'; src:url('Ratzif22-Regular.otf') format('opentype'); font-weight:400; }
+    @font-face { font-family:'Ratzif22'; src:url('Ratzif22-Medium.otf') format('opentype'); font-weight:500; }
+    @font-face { font-family:'Ratzif22'; src:url('Ratzif22-Bold.otf') format('opentype'); font-weight:700; }
+    @font-face { font-family:'GoogleSans'; src:url('fonts/GoogleSans-Regular.ttf') format('truetype'); font-weight:400; }
+    @font-face { font-family:'GoogleSans'; src:url('fonts/GoogleSans-Medium.ttf') format('truetype'); font-weight:500; }
+    @font-face { font-family:'GoogleSans'; src:url('fonts/GoogleSans-SemiBold.ttf') format('truetype'); font-weight:600; }
+    @font-face { font-family:'GoogleSans'; src:url('fonts/GoogleSans-Bold.ttf') format('truetype'); font-weight:700; }
+
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+
+    :root {
+      --cream:  #FAF7F2;
+      --navy:   #003A5E;
+      --stone:  #D4D2CC;
+      --white:  #FFFFFF;
+      --grey:   #777777;
+      --m:      100px;   /* unified section horizontal margin */
+      --m2:     100px;   /* unified section horizontal margin */
+      --f:      'GoogleSans', 'Ratzif22', sans-serif;
+    }
+
+    html { scroll-behavior:smooth; }
+    /* avoid a single orphan word on the last line of body text */
+    p, .proj-desc, .news-desc, .cform-check label, .addr-line {
+      text-wrap:pretty;
+    }
+    body { background:var(--cream); color:var(--navy); font-family:var(--f); direction:rtl; overflow-x:hidden; }
+    img  { display:block; max-width:100%; }
+    a    { text-decoration:none; color:inherit; }
+    button { cursor:pointer; font-family:var(--f); background:none; border:none; }
+
+    /* ── BUTTONS ────────────────────────────────────── */
+    .btn-solid {
+      background:var(--navy); color:#F0E7E0;
+      font-family:'Ratzif22'; font-size:18px; font-weight:700;
+      padding:10px 30px;
+      display:inline-block; white-space:nowrap;
+      transition:background .2s;
+    }
+    .btn-solid:hover { background:#004f80; }
+
+    .btn-ghost {
+      background:transparent; color:var(--navy);
+      font-family:'Ratzif22'; font-size:18px; font-weight:700;
+      padding:10px 30px;
+      border:1px solid var(--navy);
+      display:inline-block; white-space:nowrap;
+      transition:box-shadow .3s ease;
+    }
+    .btn-ghost:hover { box-shadow:0 4px 14px rgba(0,58,94,.05); }
+
+    /* star sitting in a break of the button stroke (alternate buttons only) */
+    .btn-ghost { position:relative; }
+    .btn-ghost::after {
+      content:''; position:absolute;
+      top:-12px; right:-12px;
+      width:24px; height:24px;
+      background:var(--cream) url("data:image/svg+xml,%3Csvg width='19' height='19' viewBox='0 0 19 19' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M18.9336 9.36613L12.4571 10.0205C11.1921 10.1463 10.196 11.1571 10.0909 12.4239L9.54877 18.8958L8.89314 12.4322C8.76285 11.1697 7.75417 10.1756 6.48493 10.0708L0 9.52971L6.47652 8.87538C7.74157 8.74955 8.73343 7.73869 8.8427 6.47198L9.38486 0L10.0405 6.46359C10.1708 7.72611 11.1795 8.72019 12.4487 8.82505L18.9336 9.36613Z' fill='%23003A5E'/%3E%3Cpath d='M13.3734 13.2791L10.4524 10.9009C9.88085 10.4353 9.0613 10.4437 8.50233 10.9177L5.62761 13.3462L8.0106 10.4353C8.47711 9.86488 8.4687 9.04697 7.99379 8.48492L5.56036 5.61594L8.47711 7.99417C9.04869 8.45975 9.86824 8.45136 10.4314 7.97739L13.3061 5.54883L10.9231 8.45975C10.4566 9.03019 10.465 9.8481 10.94 10.4102L13.3734 13.2791Z' fill='%23003A5E'/%3E%3C/svg%3E") center / 19px 19px no-repeat;
+      pointer-events:none;
+      transition:right .6s cubic-bezier(.4,0,.2,1), transform .6s cubic-bezier(.4,0,.2,1);
+    }
+    /* hover: the star (and its stroke break) runs along the top edge to the left corner, mirrored */
+    .btn-ghost:hover::after {
+      right:calc(100% - 12px);
+      transform:scaleX(-1);
+    }
+
+    /* ── DIVIDER DASH ─────────────────────────────── */
+    .sec-dash { display:none; }
+    .sec-top, .proj-bottom-dash, .numbers-top-dash, .numbers-bottom-dash,
+    .vision-top-dash, .vision-bottom-dash, .news-top-dash, .news-bottom-dash { display:none; }
+
+    /* ── NAVBAR ──────────────────────────────────── */
+    .navbar {
+      position:fixed; top:0; left:0; right:0; z-index:100;
+      background:var(--cream);
+      height:76px;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:0 46px;
+      border-bottom:1px solid transparent;
+      transition:border-color .3s, box-shadow .3s;
+    }
+    .navbar.scrolled { border-color:var(--stone); box-shadow:0 1px 12px rgba(0,0,0,.07); }
+
+    .nav-logo {
+      position:absolute; left:50%; transform:translateX(-50%);
+      display:flex; align-items:center;
+    }
+    .nav-logo img { height:63px; width:auto; }
+
+    .nav-icons { display:flex; align-items:center; gap:20px; }
+    .nav-icon-btn { display:flex; align-items:center; padding:4px; opacity:.9; transition:opacity .2s; }
+    .nav-icon-btn:hover { opacity:1; }
+
+    /* ── MOBILE MENU ─────────────────────────────── */
+    .overlay { position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:199; opacity:0; pointer-events:none; transition:opacity .35s; }
+    .overlay.open { opacity:1; pointer-events:all; }
+
+    .mob-menu {
+      position:fixed; top:0; right:0; bottom:0;
+      width:min(320px,82vw);
+      background:var(--navy); z-index:200;
+      display:flex; flex-direction:column;
+      padding:80px 48px 48px;
+      transform:translateX(100%);
+      transition:transform .4s cubic-bezier(.4,0,.2,1);
+    }
+    .mob-menu.open { transform:translateX(0); }
+    .mob-close { position:absolute; top:24px; left:24px; color:var(--stone); font-size:22px; }
+    .mob-menu a {
+      color:rgba(255,255,255,.85); font-size:18px; font-weight:400;
+      padding:14px 0; border-bottom:1px solid rgba(255,255,255,.1);
+      display:block; text-align:right; transition:color .2s;
+    }
+    .mob-menu a:hover { color:#fff; }
+    .mob-menu-foot { margin-top:auto; display:flex; flex-direction:column; gap:6px; }
+    .mob-menu-foot span { font-size:13px; color:rgba(255,255,255,.35); text-align:right; }
+
+    /* ── HERO ────────────────────────────────────── */
+    .hero-wrap {
+      margin-top:76px;
+      padding:29px var(--m);
+      background:var(--cream);
+    }
+    .hero {
+      position:relative; width:100%;
+      height:645.7px;
+      overflow:hidden; background:var(--stone);
+    }
+    .hero > img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+    .hero-title {
+      position:absolute; bottom:36px; right:53px;
+      color:#fff; text-align:right;
+      font-family:'Ratzif22'; font-size:40px; font-weight:500; line-height:48px;
+      z-index:1;
+    }
+
+    /* ── SECTION TOP/BOTTOM DASH ─────────────────── */
+    .sec-top { padding:36px var(--m) 0; }
+    .sec-top .sec-dash { margin:0; }
+
+    /* ── PROJECTS ────────────────────────────────── */
+    .projects { background:var(--cream); padding:0; }
+
+    .projects-inner {
+      display:flex; flex-direction:column; gap:62px;
+      padding:110px 0 110px;
+    }
+
+    .projects-head {
+      display:flex; align-items:flex-end; justify-content:space-between;
+      padding:0 var(--m);
+    }
+    .projects-title-block { text-align:right; }
+    .projects-title-block h2 { font-family:'Ratzif22'; font-size:40px; font-weight:500; line-height:48px; letter-spacing:0; margin-bottom:20px; }
+
+    .tabs-wrap { display:inline-block; }
+    .tabs { display:flex; gap:20px; flex-direction:row; align-items:center; }
+    .tab {
+      font-family:'GoogleSans'; font-size:16px; font-weight:400; line-height:24px;
+      color:var(--grey);
+      cursor:pointer; transition:color .2s, border-color .2s;
+      white-space:nowrap;
+      background:none; border:none;
+      padding-bottom:4px; border-bottom:1.5px solid transparent;
+      display:flex; align-items:center; gap:4px;
+    }
+    .tab.active { color:var(--navy); font-weight:500; border-bottom-color:var(--navy); }
+    .tab:hover:not(.active) { color:var(--navy); }
+    .tab-shape { flex-shrink:0; display:block; }
+
+    /* Carousel */
+    .carousel-outer { overflow:hidden; }
+    .carousel {
+      display:flex; gap:32px;
+      overflow-x:auto; scroll-snap-type:x mandatory;
+      scrollbar-width:none; -ms-overflow-style:none;
+      cursor:grab; user-select:none; padding-bottom:2px;
+    }
+    .carousel:active { cursor:grabbing; }
+    .carousel::-webkit-scrollbar { display:none; }
+
+    .proj-card {
+      flex:0 0 351px; scroll-snap-align:start;
+      display:flex; flex-direction:column; align-items:flex-start; gap:32px;
+    }
+
+    .proj-img { width:100%; height:445px; overflow:hidden; background:var(--stone); position:relative; }
+    .proj-img img {
+      width:100%; height:100%; object-fit:cover;
+      transition:transform .8s cubic-bezier(.25,.46,.45,.94);
+      will-change:transform;
+    }
+    .proj-card:hover .proj-img img { transform:scale(1.18); }
+
+    /* status tag */
+    .proj-tag {
+      display:inline-flex; align-items:center; gap:4px;
+      padding:6px 10px 6px 16px;
+      border:1px dashed var(--stone);
+      background:rgba(255,255,255,.29);
+      font-family:'GoogleSans'; font-size:14px; font-weight:400;
+      color:var(--grey); white-space:nowrap;
+    }
+    .proj-tag svg { flex-shrink:0; display:block; }
+
+    .proj-info { text-align:right; width:100%; }
+    .proj-name { font-family:'Ratzif22'; font-size:24px; font-weight:700; line-height:normal; margin-bottom:4px; }
+    .proj-desc { font-family:'GoogleSans'; font-size:15px; font-weight:400; line-height:27px; color:var(--navy); margin-bottom:22px; max-width:70%; }
+    .proj-more {
+      font-family:'Ratzif22'; font-size:18px; font-weight:700; color:var(--navy);
+      border-bottom:1px solid var(--navy); padding-bottom:1px; display:inline-block;
+      transition:opacity .2s;
+    }
+    .proj-more:hover { opacity:.6; }
+
+    /* Scroll bar */
+    .proj-scroll {
+      height:1px; background:var(--stone);
+      width:590px; margin:24px auto 0;
+      position:relative;
+    }
+    .proj-scroll-thumb {
+      position:absolute; top:0; right:0;
+      height:1px; width:0; background:var(--navy);
+      transition:right .2s ease, width .2s ease;
+    }
+    .proj-bottom-dash { padding:40px var(--m) 0; }
+    .proj-cta-mobile { display:none; }
+
+    /* ── VISION ──────────────────────────────────── */
+    .vision { background:var(--cream); padding:0 0 110px; }
+    .vision-inner { padding:110px var(--m2) 0; }
+    .vision-top-dash { padding:36px var(--m) 0; }
+
+    .vision-top {
+      display:flex; align-items:flex-start; justify-content:space-between;
+      gap:60px; padding:0 0 36px;
+    }
+    .vision-text { max-width:565px; text-align:right; }
+    .vision-text p {
+      font-family:'GoogleSans'; font-size:15px; font-weight:400; line-height:27px;
+      color:var(--navy); margin-bottom:22px;
+    }
+    .vision-heading h2 { font-family:'Ratzif22'; font-size:40px; font-weight:500; line-height:48px; letter-spacing:0; text-align:right; }
+
+    .vision-photo { padding:0 var(--m2); }
+    .vision-photo .vision-photo-clip { overflow:hidden; }
+    .vision-photo img {
+      width:100%; height:627px; object-fit:cover; display:block;
+      transition:transform .7s ease;
+    }
+    .vision-photo:hover img { transform:scale(1.05); }
+
+    .vision-bottom-dash { padding:110px var(--m) 0; }
+
+    /* ── URBAN RENEWAL (NEW) ─────────────────────── */
+    .renewal { background:var(--cream); padding:0; }
+    .renewal-inner {
+      padding:110px var(--m2);
+      display:flex; align-items:flex-start; justify-content:space-between; gap:36px;
+    }
+    .renewal-text { max-width:577px; text-align:right; }
+    .renewal-text h2 { font-family:'Ratzif22'; font-size:40px; font-weight:500; line-height:48px; letter-spacing:0; margin-bottom:20px; }
+    .renewal-text p {
+      font-family:'GoogleSans'; font-size:15px; font-weight:400; line-height:27px;
+      color:var(--navy); margin-bottom:22px; max-width:511px;
+    }
+    .renewal-photo { flex-shrink:0; width:627px; height:627px; overflow:hidden; background:var(--stone); }
+    .renewal-photo img {
+      width:100%; height:100%; object-fit:cover;
+      transition:transform .7s ease;
+    }
+    .renewal-photo:hover img { transform:scale(1.05); }
+
+    /* ── NEWS ────────────────────────────────────── */
+    .news { background:var(--cream); padding:0; }
+    .news-inner { padding:110px var(--m2) 110px; }
+    .news-top-dash { padding:36px var(--m) 0; }
+
+    .news-head {
+      text-align:center; padding:0 0 62px;
+    }
+    .news-head h2 { font-family:'Ratzif22'; font-size:40px; font-weight:500; line-height:48px; letter-spacing:0; }
+
+    .news-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:48px; }
+
+    .news-card { display:flex; flex-direction:column; gap:0; }
+    .news-photo { overflow:hidden; background:var(--stone); }
+    .news-photo img { width:100%; height:380px; object-fit:cover; object-position:center; transition:transform .7s ease; display:block; }
+    .news-card:hover .news-photo img { transform:scale(1.05); }
+
+    .news-meta { text-align:right; display:flex; flex-direction:column; padding-top:32px; gap:0; }
+    .news-cat { font-family:'GoogleSans'; font-size:14px; font-weight:400; letter-spacing:0.2em; color:var(--grey); margin-bottom:22px; }
+    .news-title { font-family:'Ratzif22'; font-size:24px; font-weight:700; line-height:1.3; margin-bottom:4px; }
+    .news-desc { font-family:'GoogleSans'; font-size:15px; font-weight:400; line-height:27px; color:var(--navy); margin-bottom:22px; max-width:70%; }
+    .news-read {
+      font-family:'Ratzif22'; font-size:18px; font-weight:700; color:var(--navy);
+      border-bottom:1px solid var(--navy); padding-bottom:1px;
+      display:block; margin-right:0; margin-left:auto; background:none; border-top:none; border-left:none; border-right:none; cursor:pointer;
+      transition:opacity .2s; width:fit-content;
+    }
+    .news-read:hover { opacity:0.6; }
+
+    .news-cta { text-align:center; padding:86px 0 0; }
+
+    .news-bottom-dash { padding:40px var(--m) 0; }
+
+    /* ── CONTACT ─────────────────────────────────── */
+    .contact { background:var(--cream); display:grid; grid-template-columns:1fr 1fr; }
+
+    .contact-photo { position:relative; min-height:704px; display:flex; align-items:center; padding-left:var(--m2); }
+    .contact-photo-clip { overflow:hidden; width:100%; height:484px; position:relative; }
+    .contact-photo-clip img {
+      position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+      transition:transform .7s ease;
+    }
+    .contact-photo-clip:hover img { transform:scale(1.05); }
+    .addr-card {
+      position:absolute; bottom:46px; right:43px;
+      background:rgba(255,255,255,.42); padding:32px;
+      display:flex; flex-direction:column; gap:16px;
+      text-align:right; z-index:1; color:#fff;
+    }
+    /* plan-mark frame lines around the address card */
+    .af { position:absolute; pointer-events:none; }
+    .af-t { top:0; left:-7px; right:-7px; height:1px; background:#fff; }
+    .af-b { bottom:0; left:-7px; right:-7px; height:1px; background:#fff; }
+    .af-r { right:0; top:-6px; bottom:-6px; width:1px; background:#fff; }
+    .af-l { left:0; top:-6px; bottom:-6px; width:0; border-left:1px dashed #fff; }
+    .af-d1 { top:-.5px; left:-7px; width:14px; height:1px; background:#fff; transform:rotate(45deg); }
+    .af-d2 { bottom:-.5px; left:-7px; width:14px; height:1px; background:#fff; transform:rotate(-45deg); }
+
+    .addr-title { font-size:18px; font-weight:400; color:#fff; line-height:28px; }
+    .addr-line { font-size:16px; font-weight:400; color:#fff; line-height:24px; }
+    .addr-phone { font-size:16px; font-weight:400; color:#fff; line-height:24px; direction:ltr; text-align:right; }
+
+    .contact-form {
+      background:var(--cream);
+      padding:110px var(--m2);
+      display:flex; flex-direction:column; justify-content:center; gap:48px;
+    }
+    .contact-form h2 { font-family:'Ratzif22'; font-size:40px; font-weight:500; line-height:48px; letter-spacing:0; text-align:right; }
+
+    .cform { display:flex; flex-direction:column; gap:32px; }
+    .cform-row { display:flex; gap:32px; }
+
+    .cfield {
+      flex:1; display:flex; flex-direction:column; gap:0;
+      border-bottom:1px solid var(--stone); padding-bottom:4px;
+      transition:border-color .2s;
+    }
+    .cfield:focus-within { border-color:var(--navy); }
+    .cfield label {
+      font-size:15px; color:var(--grey);
+      text-align:right; font-weight:400;
+    }
+    .cfield input {
+      background:none; border:none; outline:none;
+      font-family:var(--f); font-size:15px; font-weight:400; line-height:27px;
+      color:var(--navy); text-align:right; direction:rtl;
+      padding:5px 0; width:100%;
+    }
+    .cfield input::placeholder { color:var(--navy); font-size:15px; font-weight:400; }
+
+    .cform-check {
+      display:flex; align-items:flex-start; gap:10px; justify-content:flex-start;
+    }
+    .cform-check label { font-size:15px; font-weight:400; color:var(--grey); line-height:27px; text-align:right; cursor:pointer; }
+    .cform-check input[type=checkbox] { width:14px; height:14px; accent-color:var(--navy); flex-shrink:0; margin-top:6px; }
+
+    /* ── FOOTER ──────────────────────────────────── */
+    footer {
+      background:var(--white);
+      background-image:repeating-linear-gradient(
+        to bottom,
+        rgba(239,236,229,.59) 0, rgba(239,236,229,.59) .5px,
+        transparent .5px, transparent 14.5px
+      );
+    }
+
+    .footer-main {
+      padding:90px var(--m) 64px;
+      display:flex; align-items:flex-start; justify-content:center; gap:188px;
+      border-bottom:1px solid var(--stone);
+    }
+
+    .footer-logo img { height:117px; width:auto; }
+
+    .footer-cols { display:flex; gap:188px; }
+    .fcol { display:flex; flex-direction:column; gap:6px; align-items:flex-start; text-align:right; }
+    .fcol-h { font-family:'Ratzif22'; font-size:16px; font-weight:700; margin-bottom:0; color:var(--navy); }
+    .fcol a, .fcol span:not(.fcol-h) {
+      font-size:13px; font-weight:400; color:var(--navy); line-height:1.5;
+    }
+    .fcol a:hover { color:var(--navy); }
+
+    .footer-bar {
+      padding:20px var(--m);
+      display:flex; justify-content:center; align-items:center; gap:125px;
+    }
+    .footer-bar span, .footer-bar a {
+      font-size:12px; font-weight:400; color:var(--navy);
+    }
+    .footer-bar a:hover { color:var(--navy); }
+    .footer-bar-left { display:flex; gap:125px; }
+    .footer-bar-right { display:flex; gap:125px; }
+
+    /* ── TOAST ───────────────────────────────────── */
+    #toast {
+      position:fixed; bottom:40px; left:50%;
+      transform:translateX(-50%) translateY(50px);
+      background:var(--navy); color:#fff;
+      font-size:16px; font-weight:300;
+      padding:16px 40px; z-index:999;
+      opacity:0; transition:all .4s ease; pointer-events:none;
+    }
+    #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+    /* ── RESPONSIVE ──────────────────────────────── */
+    @media(max-width:1280px) {
+      .renewal-photo { width:48%; height:auto; aspect-ratio:1/1; }
+    }
+    @media(max-width:1200px) {
+      :root { --m:60px; --m2:60px; }
+    }
+    @media(max-width:900px) {
+      :root { --m:32px; --m2:32px; }
+      .vision-top { flex-direction:column; }
+      .renewal-inner { flex-direction:column; }
+      .renewal-photo { width:100%; }
+      .contact { grid-template-columns:1fr; }
+      .contact-photo { min-height:380px; }
+      .contact-form { padding:60px var(--m2); }
+      .news-grid { grid-template-columns:1fr; }
+    }
+
+    /* ── MOBILE ──────────────────────────────────── */
+    @media(max-width:768px) {
+      :root { --m:24px; --m2:24px; }
+
+      /* Typography */
+      h2 { font-size:28px !important; line-height:36px !important; }
+      .proj-name, .news-title { font-size:18px; }
+      .news-cat { font-size:12px; }
+      .proj-desc, .news-desc { font-size:15px; }
+      .fcol-h { font-size:16px; }
+      .fcol a, .fcol span:not(.fcol-h) { font-size:13px; }
+
+      /* Spacing */
+      .projects-inner { padding:64px 0; gap:48px; }
+      .vision { padding-bottom:64px; }
+      .vision-inner { padding:64px var(--m2) 0; }
+      .renewal-inner { padding:64px var(--m2); }
+      .news-inner { padding:64px var(--m2); }
+      .contact-form { padding:64px var(--m); }
+      .footer-main { padding:64px var(--m); gap:48px; flex-direction:column; align-items:flex-start; }
+
+      /* Navbar */
+      .navbar { justify-content:space-between; padding:0 var(--m); }
+      .nav-logo { position:static; transform:none; order:2; }
+      .nav-icons { order:1; }
+      .nav-icon-btn[aria-label="חיפוש"] { display:none; }
+      .navbar > .btn-solid { display:none; }
+      .mob-cta { display:inline-block; margin-bottom:16px; }
+      .mob-search { display:flex; align-items:center; gap:10px; color:rgba(255,255,255,.7); font-size:15px; margin-bottom:16px; cursor:pointer; }
+
+      /* Hero */
+      .hero-wrap { padding:0 var(--m) 29px; }
+      .hero { height:580px; }
+      .hero-title { font-size:28px; line-height:38px; bottom:32px; right:24px; }
+
+      /* Projects */
+      .projects-inner { gap:24px; }
+      .projects-head { flex-direction:column; align-items:flex-start; gap:24px; padding:0 var(--m); }
+      .projects-head > .btn-ghost { display:none; }
+      .projects-title-block, .tabs-wrap { width:100%; }
+      .proj-cta-mobile { display:block; padding-top:32px; }
+      .tab { font-size:13px; flex-shrink:0; }
+      .tabs {
+        flex-wrap:nowrap; gap:20px;
+        overflow-x:auto; scroll-snap-type:x proximity;
+        scrollbar-width:none; -ms-overflow-style:none;
+        -webkit-overflow-scrolling:touch;
+      }
+      .tabs::-webkit-scrollbar { display:none; }
+      .proj-card { flex:0 0 calc(100vw - 100px); gap:20px; }
+      .proj-img { height:auto; aspect-ratio:1054/1337; }
+      .carousel { padding:0 var(--m) 2px; }
+      .proj-scroll { width:calc(100% - 48px); }
+
+      /* Vision */
+      .vision-top { flex-direction:column; gap:32px; padding:0 0 32px; }
+      .vision-text { max-width:100%; }
+      .vision-photo img { height:320px; }
+
+      /* News */
+      .news-grid { grid-template-columns:1fr; gap:40px; }
+      .news-photo img { height:240px; object-position:top; }
+      .news-head { padding:0 0 40px; }
+      .news-cta { padding:40px 0 0; }
+
+      /* Contact */
+      .contact { grid-template-columns:1fr; }
+      .contact-photo { display:none; }
+      .cform-row { flex-direction:column; }
+
+      /* Footer */
+      .footer-main { align-items:center; }
+      .footer-cols { flex-direction:column; gap:40px; align-items:center; }
+      .fcol { align-items:center; text-align:center; }
+      .footer-logo { text-align:center; }
+      .footer-logo img { height:64px; }
+      .footer-bar { flex-direction:column; gap:24px; align-items:center; padding:40px var(--m); text-align:center; }
+      .footer-bar-left, .footer-bar-right { flex-direction:column; gap:8px; align-items:center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- overlay -->
+<div class="overlay" id="overlay" onclick="closeMenu()"></div>
+
+<!-- mobile menu -->
+<div class="mob-menu" id="mobMenu">
+  <button class="mob-close" onclick="closeMenu()">✕</button>
+  <a href="#projects" onclick="closeMenu()">הפרויקטים שלנו</a>
+  <a href="#vision"   onclick="closeMenu()">אודות</a>
+  <a href="#renewal"  onclick="closeMenu()">התחדשות עירונית</a>
+  <a href="#"         onclick="closeMenu()">חברה קבלנית</a>
+  <a href="#news"     onclick="closeMenu()">חדשות ועדכונים</a>
+  <a href="#contact"  onclick="closeMenu()">צור קשר</a>
+  <div class="mob-menu-foot">
+    <div class="mob-search">
+      <svg width="20" height="21" viewBox="0 0 20 21" fill="none"><path d="M8.75 15.75C12.2018 15.75 15 12.8119 15 9.1875C15 5.56313 12.2018 2.625 8.75 2.625C5.29822 2.625 2.5 5.56313 2.5 9.1875C2.5 12.8119 5.29822 15.75 8.75 15.75Z" stroke="rgba(255,255,255,.7)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M13.1699 13.8281L17.5004 18.3751" stroke="rgba(255,255,255,.7)" stroke-width="1.5" stroke-linejoin="round"/></svg>
+      <span>חיפוש</span>
+    </div>
+    <span>*9240</span>
+    <span>info@once-estate.com</span>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+  <!-- right: icons (RTL start) -->
+  <div class="nav-icons">
+    <button class="nav-icon-btn" aria-label="חיפוש">
+      <svg width="20" height="21" viewBox="0 0 20 21" fill="none"><path d="M8.75 15.75C12.2018 15.75 15 12.8119 15 9.1875C15 5.56313 12.2018 2.625 8.75 2.625C5.29822 2.625 2.5 5.56313 2.5 9.1875C2.5 12.8119 5.29822 15.75 8.75 15.75Z" stroke="#003A5E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M13.1699 13.8281L17.5004 18.3751" stroke="#003A5E" stroke-width="1.5" stroke-linejoin="round"/></svg>
+    </button>
+    <button class="nav-icon-btn" aria-label="תפריט" onclick="openMenu()">
+      <svg width="26" height="14" viewBox="0 0 26 14" fill="none"><path d="M11.4062 6.75L25.4248 6.75" stroke="#003A5E" stroke-width="1.5" stroke-linejoin="round"/><path d="M0 0.75H25.4248" stroke="#003A5E" stroke-width="1.5" stroke-linejoin="round"/><path d="M0 12.75H25.4248" stroke="#003A5E" stroke-width="1.5" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+
+  <!-- center: logo -->
+  <div class="nav-logo">
+    <a href="#top"><img src="zoom-in/full logo.svg" alt="ONCE אסף נחשוני"></a>
+  </div>
+
+  <!-- left: CTA (RTL end) -->
+  <a href="#contact" class="btn-solid">ליצירת קשר</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero-wrap" id="top">
+  <section class="hero">
+    <img src="zoom-in/hero.png" alt="">
+    <h2 class="hero-title">חווית מגורים, איכות, דיוק.</h2>
+  </section>
+</div>
+
+<!-- PROJECTS -->
+<section class="projects" id="projects">
+  <div class="sec-top"><span class="sec-dash"></span></div>
+  <div class="projects-inner">
+    <div class="projects-head">
+      <div class="projects-title-block">
+        <h2>הפרויקטים שלנו</h2>
+        <div class="tabs-wrap">
+          <div class="tabs">
+            <button class="tab active" onclick="setTab(this)">
+              <svg class="tab-shape" width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2.2 6.5L10.8 1.6V11.4L2.2 6.5Z" stroke="#D4D2CC"/></svg>
+              פרוייקטים מאוכלסים
+            </button>
+            <button class="tab" onclick="setTab(this)">
+              <svg class="tab-shape" width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#D4D2CC"/></svg>
+              פרוייקטים בשיווק וביצוע
+            </button>
+            <button class="tab" onclick="setTab(this)">
+              <svg class="tab-shape" width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="1" width="11" height="11" stroke="#D4D2CC"/></svg>
+              פרוייקטים ברישוי
+            </button>
+          </div>
+        </div>
+      </div>
+      <a href="#" class="btn-ghost">לרשימה המלאה</a>
+    </div>
+    <div class="carousel-outer" style="padding:0 var(--m);">
+    <div class="carousel" id="carousel">
+
+      <div class="proj-card">
+        <div class="proj-img">
+          <img src="zoom-in/1a.png" alt="אהרוני 24" loading="lazy">
+        </div>
+        <div class="proj-tag">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2.2 6.5L10.8 1.6V11.4L2.2 6.5Z" stroke="#D4D2CC"/></svg>
+          פרוייקט באכלוס
+        </div>
+        <div class="proj-info">
+          <div class="proj-name">אהרוני 24</div>
+          <div class="proj-desc">בניין מגורים חדש שכולו פינוק, יוקרה ואיכות חיים גבוהה, בצפון הנחשק של רחובות.</div>
+          <button class="proj-more">גלו עוד</button>
+        </div>
+      </div>
+
+      <div class="proj-card">
+        <div class="proj-img">
+          <img src="zoom-in/2a.png" alt="אייזנברג 38-40" loading="lazy">
+        </div>
+        <div class="proj-tag">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#D4D2CC"/></svg>
+          פרוייקט בשיווק וביצוע
+        </div>
+        <div class="proj-info">
+          <div class="proj-name">אייזנברג 38-40</div>
+          <div class="proj-desc">ברחוב אייזנברג, אחד המקומות המבוקשים ביותר ברחובות, נבנה פרוייקט מגורים אקסקלוסיבי.</div>
+          <button class="proj-more">גלו עוד</button>
+        </div>
+      </div>
+
+      <div class="proj-card">
+        <div class="proj-img">
+          <img src="zoom-in/3a.png" alt="הרא״ז 13" loading="lazy">
+        </div>
+        <div class="proj-tag">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="1" width="11" height="11" stroke="#D4D2CC"/></svg>
+          פרוייקט ברישוי
+        </div>
+        <div class="proj-info">
+          <div class="proj-name">הרא״ז 13</div>
+          <div class="proj-desc">בניין בוטיק בן 18 יחידות דיור בלבד, יעניק לכם חוויות מגורים שקטה וייחודית.</div>
+          <button class="proj-more">גלו עוד</button>
+        </div>
+      </div>
+
+      <div class="proj-card">
+        <div class="proj-img">
+          <img src="zoom-in/4a.png" alt="שדרות ח״ן 66" loading="lazy">
+        </div>
+        <div class="proj-tag">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="1" width="11" height="11" stroke="#D4D2CC"/></svg>
+          פרוייקט ברישוי
+        </div>
+        <div class="proj-info">
+          <div class="proj-name">שדרות ח״ן 66</div>
+          <div class="proj-desc">בבנייה</div>
+          <button class="proj-more">גלו עוד</button>
+        </div>
+      </div>
+
+      <div class="proj-card">
+        <div class="proj-img">
+          <img src="zoom-in/5a.png" alt="חיים ויצמן 29" loading="lazy">
+        </div>
+        <div class="proj-tag">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2.2 6.5L10.8 1.6V11.4L2.2 6.5Z" stroke="#D4D2CC"/></svg>
+          פרוייקט באכלוס
+        </div>
+        <div class="proj-info">
+          <div class="proj-name">חיים ויצמן 29</div>
+          <div class="proj-desc">מיקומו האסטרטגי של רחוב ויצמן הופכים אותו למבוקש מאוד בקרב מחפשי הדירות</div>
+          <button class="proj-more">גלו עוד</button>
+        </div>
+      </div>
+
+    </div>
+    </div>
+
+    <div class="proj-scroll">
+      <div class="proj-scroll-thumb" id="projThumb"></div>
+    </div>
+    <div class="proj-cta-mobile" style="text-align:center;">
+      <a href="#" class="btn-ghost">לרשימה המלאה</a>
+    </div>
+  </div>
+  <div class="proj-bottom-dash"><span class="sec-dash"></span></div>
+</section>
+
+<!-- VISION -->
+<section class="vision" id="vision">
+  <div class="vision-top-dash"><span class="sec-dash"></span></div>
+  <div class="vision-inner">
+    <div class="vision-top">
+      <div class="vision-heading">
+        <h2>מהחזון עד המפתח</h2>
+      </div>
+      <div class="vision-text">
+        <p>אנו עובדים עם אנשי מקצוע איכותיים ומקצועיים, בוחרים ביועצים וספקים שייתנו ללקוחותינו מוצר איכותי ושירות אדיב, והכל בכדי שהדרך לרכישת הבית של לקוחותינו, תהיה נעימה ובטוחה בדיוק כמו התוצאה.</p>
+        <a href="#" class="btn-ghost">הסיפור שלנו</a>
+      </div>
+    </div>
+  </div>
+  <div class="vision-photo">
+    <div class="vision-photo-clip">
+      <img src="Gemini_Generated_Image_5aofzb5aofzb5aof 1.png" alt="מהחזון עד המפתח" loading="lazy">
+    </div>
+  </div>
+  <div class="vision-bottom-dash"><span class="sec-dash"></span></div>
+</section>
+
+<!-- URBAN RENEWAL (NEW) -->
+<section class="renewal" id="renewal">
+  <div class="renewal-inner">
+    <div class="renewal-text">
+      <h2>התחדשות עירונית</h2>
+      <p>התחדשות עירונית היא הרבה מעבר לחיזוק מבנים – היא הזדמנות לשדרג מקצה לקצה את איכות החיים שלכם. הפרויקט מעניק לכם דירות חדשות ומרווחות עם ממ"ד, מרפסת שמש וטכנולוגיה מתקדמת, תוך שמירה על האופי והקהילתיות של האזור. זה הזמן ליהנות מבית בטוח, מודרני ובעל ערך שרק הולך ועולה.</p>
+      <a href="#" class="btn-ghost">להתחדשות עירונית</a>
+    </div>
+    <div class="renewal-photo">
+      <img src="zoom-in/renewal.jpg" alt="התחדשות עירונית" loading="lazy">
+    </div>
+  </div>
+</section>
+
+<!-- NEWS -->
+<section class="news" id="news">
+  <div class="news-top-dash"><span class="sec-dash"></span></div>
+  <div class="news-inner">
+    <div class="news-head">
+      <h2>חדשות ועדכונים</h2>
+    </div>
+    <div class="news-grid">
+
+      <!-- right card in RTL: man portrait -->
+      <div class="news-card">
+        <div class="news-photo"><img src="zoom-in/Frame 25.png" alt="" loading="lazy"></div>
+        <div class="news-meta">
+          <span class="news-cat">מאחורי הקלעים</span>
+          <div class="news-title">ראיון עם המנכ"ל</div>
+          <div class="news-desc">שיחה על חזון החברה, פרויקטים עתידיים ותפיסת המגורים של המאה ה-21.</div>
+          <button class="news-read">לקריאה נוספת</button>
+        </div>
+      </div>
+
+      <!-- middle card: woman + child -->
+      <div class="news-card">
+        <div class="news-photo"><img src="zoom-in/Frame 27.png" alt="" loading="lazy"></div>
+        <div class="news-meta">
+          <span class="news-cat">פיתוח ובנייה</span>
+          <div class="news-title">פרויקט חדש בצפון רחובות</div>
+          <div class="news-desc">השקנו פרויקט ייחודי חדש באזור צפון רחובות, קרבה לטבע ופארקים עם כל נוחיות העיר.</div>
+          <button class="news-read">לקריאה נוספת</button>
+        </div>
+      </div>
+
+      <!-- left card in RTL: building -->
+      <div class="news-card">
+        <div class="news-photo"><img src="zoom-in/Frame 28.png" alt="" loading="lazy"></div>
+        <div class="news-meta">
+          <span class="news-cat">חדשות חברה</span>
+          <div class="news-title">רובע המגורים שכולם הולכים לדבר עליו</div>
+          <div class="news-desc">רשימת המתנה כבר נפתחה: נחשפו התוכניות למתחם הצעיר שמסתמן כדבר הבא.</div>
+          <button class="news-read">לקריאה נוספת</button>
+        </div>
+      </div>
+
+    </div>
+    <div class="news-cta">
+      <a href="#" class="btn-ghost">לכל הכתבות</a>
+    </div>
+  </div>
+  <div class="news-bottom-dash"><span class="sec-dash"></span></div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact" id="contact">
+  <div class="contact-form">
+    <h2>בואו נדבר.</h2>
+    <form class="cform" onsubmit="sendForm(event)">
+      <div class="cform-row">
+        <div class="cfield">
+          <label for="ln">שם משפחה</label>
+          <input type="text" id="ln" placeholder="ישראלי">
+        </div>
+        <div class="cfield">
+          <label for="fn">שם פרטי</label>
+          <input type="text" id="fn" placeholder="ישראל">
+        </div>
+      </div>
+      <div class="cform-row">
+        <div class="cfield">
+          <label for="ph">טלפון</label>
+          <input type="tel" id="ph" placeholder="050-0000000" dir="ltr" style="text-align:right">
+        </div>
+        <div class="cfield">
+          <label for="em">אימייל</label>
+          <input type="email" id="em" placeholder="name@company.com" dir="ltr" style="text-align:right">
+        </div>
+      </div>
+      <div class="cform-check">
+        <input type="checkbox" id="ck" checked>
+        <label for="ck">הנני מאשר/ת קבלת חומר שיווקי מקבוצת אסף נחשוני לרבות ווטסאפ</label>
+      </div>
+      <div>
+        <button type="submit" class="btn-solid">שליחת הודעה</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="contact-photo">
+    <div class="contact-photo-clip">
+      <img src="zoom-in/Frame.png" alt="">
+      <div class="addr-card">
+        <span class="af af-t"></span><span class="af af-b"></span><span class="af af-r"></span><span class="af af-l"></span><span class="af af-d1"></span><span class="af af-d2"></span>
+        <div class="addr-title">כתובתינו</div>
+        <div class="addr-line">יעקב 36, רחובות</div>
+        <div class="addr-phone">*9240</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-main">
+    <div class="footer-logo">
+      <img src="zoom-in/full logo.svg" alt="ONCE אסף נחשוני">
+    </div>
+    <div class="footer-cols">
+      <div class="fcol">
+        <span class="fcol-h">ניווט</span>
+        <a href="#top">דף הבית</a>
+        <a href="#vision">אודות</a>
+        <a href="#">חברה קבלנית</a>
+        <a href="#news">חדשות ועדכונים</a>
+        <a href="#contact">יצירת קשר</a>
+      </div>
+      <div class="fcol">
+        <span class="fcol-h">פרוייקטים</span>
+        <a href="#projects">מאוכלסים</a>
+        <a href="#projects">בשיווק וביצוע</a>
+        <a href="#projects">ברישוי</a>
+        <a href="#renewal">התחדשות עירונית</a>
+      </div>
+      <div class="fcol">
+        <span class="fcol-h">פנו אלינו</span>
+        <span>*9240</span>
+        <a href="mailto:info@once-estate.com">info@once-estate.com</a>
+        <span>יעקב 36, רחובות</span>
+        <span>א׳–ה׳ &nbsp;09:00–19:00</span>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bar">
+    <div class="footer-bar-right">
+      <a href="#">הצהרת נגישות</a>
+      <a href="#">מדיניות פרטיות</a>
+    </div>
+    <div class="footer-bar-left">
+      <span>אסף נחשוני ONCE @ 2026</span>
+      <span>Created by moveo creative</span>
+    </div>
+  </div>
+</footer>
+
+<div id="toast">ההודעה נשלחה בהצלחה!</div>
+
+<script>
+/* navbar */
+const nav = document.getElementById('navbar');
+window.addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 40), {passive:true});
+
+/* mobile menu */
+function openMenu()  { document.getElementById('mobMenu').classList.add('open');  document.getElementById('overlay').classList.add('open');  document.body.style.overflow='hidden'; }
+function closeMenu() { document.getElementById('mobMenu').classList.remove('open'); document.getElementById('overlay').classList.remove('open'); document.body.style.overflow=''; }
+
+/* tabs */
+function setTab(btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+
+/* carousel */
+const car = document.getElementById('carousel');
+const thumb = document.getElementById('projThumb');
+
+function updateThumb() {
+  const max = car.scrollWidth - car.clientWidth;
+  const barW = thumb.parentElement.offsetWidth;
+  const tw = 142;
+  thumb.style.width = tw + 'px';
+  if (max <= 0) { thumb.style.right = '0'; return; }
+  const scrolled = Math.abs(car.scrollLeft);
+  const pct = Math.min(scrolled / max, 1);
+  const maxPos = barW - tw;
+  thumb.style.right = (maxPos * pct) + 'px';
+}
+car.addEventListener('scroll', updateThumb, {passive:true});
+window.addEventListener('resize', updateThumb);
+updateThumb();
+
+/* drag */
+let isDrag=false, sx=0, ss=0;
+car.addEventListener('mousedown', e => { isDrag=true; sx=e.pageX; ss=car.scrollLeft; });
+document.addEventListener('mouseup', () => isDrag=false);
+car.addEventListener('mousemove', e => { if(!isDrag) return; e.preventDefault(); car.scrollLeft = ss-(e.pageX-sx); });
+
+/* touch */
+let tx=0;
+car.addEventListener('touchstart', e => tx=e.touches[0].pageX, {passive:true});
+car.addEventListener('touchmove', e => { car.scrollLeft += tx-e.touches[0].pageX; tx=e.touches[0].pageX; }, {passive:true});
+
+/* intersection observer */
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target); } });
+}, {threshold:0.15});
+
+/* form */
+function sendForm(e) {
+  e.preventDefault();
+  const toast=document.getElementById('toast');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+  e.target.reset();
+}
+</script>
+</body>
+</html>
